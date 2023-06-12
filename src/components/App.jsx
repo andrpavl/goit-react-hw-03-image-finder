@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { fetchPics } from './Searchbar/service/fetch';
@@ -22,17 +22,18 @@ export class App extends Component {
     this.setState({ searchValue, page: 1, images: [] });
   };
 
+
   componentDidUpdate(_, prevState) {
     const { searchValue, page } = this.state;
+
     if (
       (prevState.searchValue !== searchValue && searchValue !== '') ||
       prevState.page !== page
     ) {
-      if (this.abortCtrl) {
-        this.abortCtrl.abort();
-      }
+
       this.abortCtrl = new AbortController();
       this.setState({ loading: true, error: null });
+
       fetchPics(searchValue, page, {
         signal: this.abortCtrl.signal,
       })
@@ -50,30 +51,10 @@ export class App extends Component {
     }
   }
 
-  loadMorePics = async () => {
-    const { searchValue, page } = this.state;
-    if (this.abortCtrl) {
-      this.abortCtrl.abort();
-    }
-    this.abortCtrl = new AbortController();
-    try {
-      this.setState({ loading: true, error: null });
-      const resp = await fetchPics(searchValue, page + 1, {
-        signal: this.abortCtrl.signal,
-      });
-      if (resp.data.hits.length > 0) {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...resp.data.hits],
-          page: page + 1,
-        }));
-      } else {
-        this.setState({ error: 'Can not find anything.' });
-      }
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ loading: false });
-    }
+  loadMorePics = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
   };
 
   render() {
