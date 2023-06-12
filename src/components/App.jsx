@@ -28,6 +28,9 @@ export class App extends Component {
       (prevState.searchValue !== searchValue && searchValue !== '') ||
       prevState.page !== page
     ) {
+      if (this.abortCtrl) {
+        this.abortCtrl.abort();
+      }
       this.abortCtrl = new AbortController();
       this.setState({ loading: true, error: null });
       fetchPics(searchValue, page, {
@@ -49,7 +52,9 @@ export class App extends Component {
 
   loadMorePics = async () => {
     const { searchValue, page } = this.state;
-
+    if (this.abortCtrl) {
+      this.abortCtrl.abort();
+    }
     this.abortCtrl = new AbortController();
     try {
       this.setState({ loading: true, error: null });
