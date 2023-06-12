@@ -1,5 +1,6 @@
 import { Component } from 'react';
-import {MdOutlineImageSearch} from 'react-icons/md';
+import { MdOutlineImageSearch } from 'react-icons/md';
+import css from './Searchbar.module.css';
 
 export class Searchbar extends Component {
   state = { searchValue: '' };
@@ -22,16 +23,14 @@ export class Searchbar extends Component {
 
   render() {
     return (
-      <header className="searchbar">
-        <form className="form" onSubmit={this.handleSubmit}>
-          <button type="submit" className="button">
-            <span className="button-label">
-              <MdOutlineImageSearch />
-            </span>
+      <header className={css.searchbar}>
+        <form className={css.searchform} onSubmit={this.handleSubmit}>
+          <button type="submit" className={css.searchBtn}>
+            <MdOutlineImageSearch className={css.buttonLabel} />
           </button>
 
           <input
-            className="input"
+            className={css.SearchFormInput}
             type="text"
             placeholder="Search images and photos"
             onChange={this.handleChange}
