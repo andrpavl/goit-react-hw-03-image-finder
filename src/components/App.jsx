@@ -5,6 +5,7 @@ import { fetchPics } from './Searchbar/service/fetch';
 import Loader from './Loader/Loader';
 import { Button } from './Button/Button';
 import css from './App.module.css';
+import Notiflix from 'notiflix';
 
 export class App extends Component {
   abortCtrl;
@@ -18,7 +19,7 @@ export class App extends Component {
   };
 
   handleSearch = searchValue => {
-    this.setState({ searchValue, page: 1 });
+    this.setState({ searchValue, page: 1, images: [] });
   };
 
   componentDidUpdate(_, prevState) {
@@ -33,11 +34,8 @@ export class App extends Component {
         signal: this.abortCtrl.signal,
       })
         .then(resp => {
-          if (resp.data.hits.length > 0) {
-            this.setState(prevState => ({
-              images: [...prevState.images, ...resp.data.hits],
-              error: null,
-            }));
+          if (resp.data.hits.length) {
+            this.setState({ images: resp.data.hits, error: null });
           } else {
             this.setState({ images: [], error: 'Can not find anything.' });
           }
@@ -51,6 +49,7 @@ export class App extends Component {
 
   loadMorePics = async () => {
     const { searchValue, page } = this.state;
+
     this.abortCtrl = new AbortController();
     try {
       this.setState({ loading: true, error: null });
@@ -60,7 +59,7 @@ export class App extends Component {
       if (resp.data.hits.length > 0) {
         this.setState(prevState => ({
           images: [...prevState.images, ...resp.data.hits],
-          page: prevState.page + 1,
+          page: page + 1,
         }));
       } else {
         this.setState({ error: 'Can not find anything.' });
@@ -80,10 +79,10 @@ export class App extends Component {
         <ImageGallery images={images} />
         {loading && (
           <div className={css.loader}>
-            <Loader  />
+            <Loader />
           </div>
         )}
-        {error && alert(error)}
+        {error && Notiflix.Notify.failure(error)}
         {!loading && !error && images.length >= 12 && (
           <Button onClick={this.loadMorePics} />
         )}

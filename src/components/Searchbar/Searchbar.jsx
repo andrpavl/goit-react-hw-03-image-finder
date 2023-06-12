@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import { MdOutlineImageSearch } from 'react-icons/md';
 import css from './Searchbar.module.css';
+import PropTypes from 'prop-types';
+import Notiflix from 'notiflix';
 
 export class Searchbar extends Component {
   state = { searchValue: '' };
@@ -14,7 +16,7 @@ export class Searchbar extends Component {
   handleSubmit = evt => {
     evt.preventDefault();
     if (this.state.searchValue.trim() === '') {
-      alert('Ooops! You need to enter something');
+      Notiflix.Notify.warning('Ooops! You need to enter something');
       return;
     }
     this.props.onSubmit(this.state.searchValue);
@@ -41,3 +43,7 @@ export class Searchbar extends Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
