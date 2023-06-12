@@ -22,39 +22,53 @@ export class App extends Component {
     this.setState({ searchValue, page: 1, images: [] });
   };
 
-
-  componentDidUpdate(_, prevState) {
+  async componentDidUpdate(_, prevState) {
     const { searchValue, page } = this.state;
 
-    if (
-      (prevState.searchValue !== searchValue && searchValue !== '') ||
-      prevState.page !== page
-    ) {
-
+    if (prevState.searchValue !== this.state.searchValue) {
+     
       this.abortCtrl = new AbortController();
-      this.setState({ loading: true, error: null });
-
-      fetchPics(searchValue, page, {
-        signal: this.abortCtrl.signal,
-      })
-        .then(resp => {
-          if (resp.data.hits.length) {
-            this.setState({ images: resp.data.hits, error: null });
-          } else {
-            this.setState({ images: [], error: 'Can not find anything.' });
-          }
-        })
-        .catch(error => this.setState({ error: error.message }))
-        .finally(() => {
-          this.setState({ loading: false });
+      try {
+        this.setState({ loading: true, error: null });
+        const resp = await fetchPics(searchValue, page, {
+          signal: this.abortCtrl.signal,
         });
+        if (resp.data.hits) {
+          this.setState({
+            images: resp.data.hits,
+            error: null,
+          });
+        } else {
+          this.setState({ images: [], error: 'Can not find anything.' });
+        }
+      } catch (error) {
+        this.setState({ error: error.message });
+      } finally {
+        this.setState({ loading: false });
+      }
     }
   }
 
-  loadMorePics = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+
+
+  loadMorePics = async () => {
+    const { searchValue, page } = this.state;
+    this.abortCtrl = new AbortController();
+
+    try {
+      this.setState({ loading: true, error: null });
+      const resp = await fetchPics(searchValue, page + 1, {
+        signal: this.abortCtrl.signal,
+      });
+      this.setState(prevState => ({
+        images: [...prevState.images, ...resp.data.hits],
+        page: prevState.page + 1,
+      }));
+    } catch (error) {
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ loading: false });
+    }
   };
 
   render() {
