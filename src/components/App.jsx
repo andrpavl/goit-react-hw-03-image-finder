@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-import { fetchPics } from './service/fetch';
+import { fetchPics } from '../service/fetch';
 import Loader from './Loader/Loader';
 import { Button } from './Button/Button';
 import css from './App.module.css';
